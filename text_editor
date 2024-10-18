@@ -1,0 +1,83 @@
+import java.util.Stack;
+
+// Kelas TextEditor yang merepresentasikan text editor sederhana
+class TextEditor {
+    private StringBuilder text; // Menyimpan teks saat ini
+    private Stack<String> undoStack; // Stack untuk menyimpan teks untuk undo
+    private Stack<String> redoStack; // Stack untuk menyimpan teks untuk redo
+
+    // Constructor
+    public TextEditor() {
+        this.text = new StringBuilder();
+        this.undoStack = new Stack<>();
+        this.redoStack = new Stack<>();
+    }
+
+    // Fungsi untuk menampilkan semua teks
+    public void show() {
+        System.out.println("Teks saat ini: " + text.toString());
+    }
+
+    // Fungsi untuk menambahkan teks
+    public void write(String newText) {
+        // Simpan keadaan saat ini untuk undo
+        undoStack.push(text.toString());
+        // Kosongkan redoStack karena ada perubahan baru
+        redoStack.clear();
+        // Tambahkan teks baru
+        text.append(newText);
+    }
+
+    // Fungsi untuk mengembalikan isi teks ke isi sebelumnya
+    public void undo() {
+        if (!undoStack.isEmpty()) {
+            // Simpan keadaan saat ini untuk redo
+            redoStack.push(text.toString());
+            // Kembalikan teks ke keadaan sebelumnya
+            text = new StringBuilder(undoStack.pop());
+        } else {
+            System.out.println("Tidak ada tindakan untuk di-undo.");
+        }
+    }
+
+    // Fungsi untuk memulihkan pengembalian isi teks
+    public void redo() {
+        if (!redoStack.isEmpty()) {
+            // Simpan keadaan saat ini untuk undo
+            undoStack.push(text.toString());
+            // Kembalikan teks ke keadaan yang lebih baru
+            text = new StringBuilder(redoStack.pop());
+        } else {
+            System.out.println("Tidak ada tindakan untuk di-redo.");
+        }
+    }
+
+    // Main method untuk testing
+    public static void main(String[] args) {
+        TextEditor editor = new TextEditor();
+        
+        editor.write("Hello, ");
+        editor.show(); // Output: Hello, 
+
+        editor.write("world!");
+        editor.show(); // Output: Hello, world!
+
+        editor.undo();
+        editor.show(); // Output: Hello, 
+
+        editor.redo();
+        editor.show(); // Output: Hello, world!
+
+        editor.write(" This is a text editor.");
+        editor.show(); // Output: Hello, world! This is a text editor.
+
+        editor.undo();
+        editor.show(); // Output: Hello, world!
+
+        editor.undo();
+        editor.show(); // Output: Hello, 
+
+        editor.redo();
+        editor.show(); // Output: Hello, world!
+    }
+}
